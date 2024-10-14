@@ -18,13 +18,16 @@ class Controller () {
     fun ClientDelController (id : Int) : Boolean  = myListClient.removeAll { it.id == id }
 
 
-    fun ClientUpdateController (id : Int, name : String): Boolean {
-        val findClient : Client? = myListClient.find { it.id == id }
-        return findClient?.let{
+    fun ClientUpdateController(id: Int, name: String, apellidos: String, telefono: String): Boolean {
+        val findClient: Client? = myListClient.find { it.id == id }
+        return findClient?.let {
             it.name = name
+            it.apellidos = apellidos
+            it.telefono = telefono
             true
-        }?:false
+        } ?: false
     }
+
 
     fun showData() = myListClient.toString()
 
