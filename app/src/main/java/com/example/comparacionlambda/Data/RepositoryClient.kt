@@ -2,19 +2,11 @@ package com.example.comparacionlambda.Data
 
 import com.example.comparacionlambda.Logic.Client
 
-
-class RepositoryClient {
-
-    companion object {  //Sólo puedo tener un companion object por clase.
-        var primary = 100
-        //Actualizamos la lista con valores nuevos
-        val arrayClient: List<Client> = listOf(
-            Client(incrementPrimary(), "Santi","Velez", "92352902"),
-            Client(incrementPrimary(), "Sonia", "Gomez", "723948"),
-            Client(incrementPrimary(), "Guille", "Martinez", "9359632"),
-            Client(incrementPrimary(), "Diego", "Diana", "9723472")
-        )
-
-        fun incrementPrimary() = primary++ //devuelvo la clave e incremento.
-    }
+object RepositoryClient {
+    val initialClients = listOf(
+        Client(100, "Santi", "González", "123456789"),
+        Client(101, "Sonia", "Martínez", "987654321"),
+        Client(102, "Guille", "López", "456789123"),
+        Client(103, "Diego", "Fernández", "789123456")
+    )
 }

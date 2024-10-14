@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
     private lateinit var myButtonAdd: ImageView
     private lateinit var myButtonUpdate: ImageView
     private lateinit var myButtonDel: ImageView
-    private lateinit var myDialog: Dialog
+    private lateinit var myDialog: SimulatedDialogFragment
     private val controller = Controller()
 
     companion object {
@@ -28,48 +28,58 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
         myButtonAdd = findViewById(R.id.myButtonAdd)
         myButtonUpdate = findViewById(R.id.myButtomEdit)
         myButtonDel = findViewById(R.id.myButtomDel)
-        myDialog = Dialog(this)
 
-        myButtonAdd.setOnClickListener { myDialog.show(0) }
-        myButtonUpdate.setOnClickListener { myDialog.show(1) }
-        myButtonDel.setOnClickListener { myDialog.show(2) }
+        myDialog = SimulatedDialogFragment(this) // Pasamos `this` que implementa OperationsInterface
+
+        myButtonAdd.setOnClickListener {
+            myDialog.showInsertDialog()
+        }
+
+        myButtonUpdate.setOnClickListener {
+            myDialog.showUpdateDialog()
+        }
+
+        myButtonDel.setOnClickListener {
+            myDialog.showDeleteDialog()
+        }
     }
 
     override fun ClientAdd(id: Int, name: String, apellidos: String, telefono: String) {
         val newClient = Client(id, name, apellidos, telefono)
-        controller.ClientAddController(newClient)
-        val msg = "El cliente con id = $id, ha sido insertado correctamente"
+        controller.addClient(newClient)
+        val msg = "El cliente con id = ${newClient.id}, ha sido insertado correctamente"
         Log.d(TAG, msg)
-        showConsoleData(msg)
+        showConsoleData()
     }
-
     override fun ClientDel(id: Int) {
-        val delete = controller.ClientDelController(id)
-        val msg = if (delete) {
-            "El cliente con id = $id, ha sido eliminado correctamente"
+        val deleted = controller.deleteClient(id)
+        val msg = if (deleted) {
+            "El cliente con id = $id ha sido eliminado correctamente"
         } else {
-            "El cliente con id = $id, no ha sido encontrado para eliminar"
+            "El cliente con id = $id no existe para eliminar"
         }
         Log.d(TAG, msg)
-        showConsoleData(msg)
+        showConsoleData()
     }
 
     override fun ClientUpdate(id: Int, name: String, apellidos: String, telefono: String) {
-        val update = controller.ClientUpdateController(id, name, apellidos, telefono)
-        val msg = if (update) {
+        val updated = controller.updateClient(id, name, apellidos, telefono)
+        val msg = if (updated) {
             "El cliente con id = $id, ha sido actualizado correctamente"
         } else {
-            "El cliente con id = $id, no ha sido encontrado para actualizar"
+            "El cliente con id = $id no existe para actualizar"
         }
         Log.d(TAG, msg)
-        showConsoleData(msg)
+        showConsoleData()
     }
+
 
     override fun devIdRandom(): Int {
-        return controller.devIdRandom()
+        val client = controller.getAllClients().randomOrNull()
+        return client?.id ?: -1
     }
 
-    fun showConsoleData(msg: String) {
-        Log.d(TAG, controller.showData())
+    private fun showConsoleData() {
+        Log.d(TAG, controller.getAllClients().toString())
     }
 }

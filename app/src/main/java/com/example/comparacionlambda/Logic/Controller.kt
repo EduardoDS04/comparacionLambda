@@ -1,46 +1,30 @@
 package com.example.comparacionlambda.Logic
 
-
 import com.example.comparacionlambda.Data.RepositoryClient
-import kotlin.random.Random
 
-class Controller () {
-    private var myListClient: MutableList<Client>  //eso realmente, no se declararía aquí. Esto es interfaz.
+class Controller {
+    private val clientsList: MutableList<Client> = RepositoryClient.initialClients.toMutableList()
 
-    init{
-        myListClient = RepositoryClient.arrayClient.toMutableList()
+    fun addClient(client: Client) {
+        clientsList.add(client)
     }
 
-    fun ClientAddController(cli : Client){
-        myListClient.add(cli)
-    }
-
-    fun ClientDelController (id : Int) : Boolean  = myListClient.removeAll { it.id == id }
-
-
-    fun ClientUpdateController(id: Int, name: String, apellidos: String, telefono: String): Boolean {
-        val findClient: Client? = myListClient.find { it.id == id }
-        return findClient?.let {
+    fun updateClient(id: Int, name: String, apellidos: String, telefono: String): Boolean {
+        val client = clientsList.find { it.id == id }
+        client?.let {
             it.name = name
             it.apellidos = apellidos
             it.telefono = telefono
-            true
-        } ?: false
-    }
-
-
-    fun showData() = myListClient.toString()
-
-    fun devClient (pos : Int) = myListClient.find {  it.id == pos }
-
-
-    fun devIdRandom() : Int{
-        return if (myListClient.size == 0 ) {
-            -1
-        }else {
-            val p = Random.nextInt(0, myListClient.size)
-            myListClient[p].id
+            return true
         }
+        return false
     }
 
+    fun deleteClient(id: Int): Boolean {
+        return clientsList.removeAll { it.id == id }
+    }
+
+    fun getAllClients(): List<Client> {
+        return clientsList
+    }
 }
