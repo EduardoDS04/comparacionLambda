@@ -1,3 +1,9 @@
 package com.example.comparacionlambda.Logic
 
-data class Client(var id : Int, var name : String)
+// Añadimos los nuevos campos requeridos para el CRUD
+data class Client(
+    var id: Int,
+    var name: String,
+    var apellidos: String,
+    var telefono: String
+)

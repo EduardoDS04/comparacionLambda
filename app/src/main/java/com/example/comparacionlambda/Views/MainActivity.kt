@@ -6,109 +6,72 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.comparacionlambda.Logic.Client
 import com.example.comparacionlambda.Logic.Controller
-import com.example.comparacionlambda.Logic.interfaces.OperationsInterface
 import com.example.comparacionlambda.R
 
+class MainActivity : AppCompatActivity() {
 
-class MainActivity : AppCompatActivity(), OperationsInterface {
     private lateinit var myButtonAdd: ImageView
     private lateinit var myButtonUpdate: ImageView
     private lateinit var myButtonDel: ImageView
-    private lateinit var myDialog : Dialog
-    private val controller= Controller()
+    private val controller = Controller()
 
     companion object {
         const val TAG = "---SALIDA---"
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //      enableEdgeToEdge()  //barra superior transparente. App de borde a borde (toaaaa)
         setContentView(R.layout.activity_main)
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-//            insets
-//        }
-        Log. d(TAG, "Esto es un ejemplo de log")
-        start()
-    }
 
-
-
-
-    //Aquí comienza todo. Como si fuera nuestro main
-    private fun start() {
-        myButtonAdd = findViewById(R.id.myButtonAdd)   //Recuperamos la referencia en memoria del botón de la interfaz.
+        myButtonAdd = findViewById(R.id.myButtonAdd)
         myButtonUpdate = findViewById(R.id.myButtomEdit)
         myButtonDel = findViewById(R.id.myButtomDel)
-        myDialog = Dialog(controller)
 
-        myDialog.setListener(this) //Le paso mi referencia como objeto que estoy obligado a implementar los tres métodos.
-
-        myButtonAdd.setOnClickListener{
-            //acepta una lambda, por tanto es una referencia a una función anónima.
-            myDialog.show(0)  //mostramos el dialogo que me permite la inserción de datos en los campos de edición.
+        // Definimos las lambdas para cada operación del CRUD
+        val addClientLambda: (Int, String, String, String) -> Unit = { id, name, apellidos, telefono ->
+            val newClient = Client(id, name, apellidos, telefono)
+            controller.addClient(newClient)
+            val msg = "El cliente con id = ${newClient.id}, ha sido insertado correctamente"
+            Log.d(TAG, msg)
+            showConsoleData()
         }
 
-        myButtonUpdate.setOnClickListener{
-            myDialog.show(1)  //mostramos el dialogo que me permite la edición de datos en los campos de edición.
-
+        val deleteClientLambda: (Int) -> Unit = { id ->
+            val deleted = controller.deleteClient(id)
+            val msg = if (deleted) {
+                "El cliente con id = $id ha sido eliminado correctamente"
+            } else {
+                "El cliente con id = $id no existe para eliminar"
+            }
+            Log.d(TAG, msg)
+            showConsoleData()
         }
 
-        myButtonDel.setOnClickListener( {
-            myDialog.show(2)  //mostramos el dialogo que me permite la eliminación de datos en los campos de edición.
+        val updateClientLambda: (Int, String, String, String) -> Unit = { id, name, apellidos, telefono ->
+            val updated = controller.updateClient(id, name, apellidos, telefono)
+            val msg = if (updated) {
+                "El cliente con id = $id, ha sido actualizado correctamente"
+            } else {
+                "El cliente con id = $id no existe para actualizar"
+            }
+            Log.d(TAG, msg)
+            showConsoleData()
+        }
 
-        })
+        val getRandomIdLambda: () -> Int = {
+            val client = controller.getAllClients().randomOrNull()
+            client?.id ?: -1
+        }
 
+        //  lambdas a SimulatedDialogFragment
+        val myDialog = SimulatedDialogFragment(addClientLambda, deleteClientLambda, updateClientLambda, getRandomIdLambda)
 
+        myButtonAdd.setOnClickListener { myDialog.showInsertDialog() }
+        myButtonUpdate.setOnClickListener { myDialog.showUpdateDialog() }
+        myButtonDel.setOnClickListener { myDialog.showDeleteDialog() }
     }
 
-
-    override fun ClientAdd(id: Int, name: String){
-        val newClient = Client (id, name)
-        controller.ClientAddController(newClient)
-        var msg =  "El cliente con id = $id, ha sido insertado correctamente"
-
-        Log.d(TAG, msg)
-        showConsoleData(msg)
-    }
-
-    override fun ClientDel(id: Int) {
-        var msg = ""
-        val delete = controller.ClientDelController(id)  //borramos
-
-        if (delete)
-            msg =  "El cliente con id = $id, ha sido eliminado correctamente"
-        else
-            msg = "El cliente con id = $id, no ha sido encontrado para eliminar"
-
-        Log. d(TAG, msg)
-        showConsoleData(msg)
-
-    }
-
-
-
-    override fun ClientUpdate(id: Int, name: String) {
-        var msg = ""
-        val update = controller.ClientUpdateController(id, name)  //borramos el 2.
-
-        if (update)
-            msg =  "El cliente con id = $id, ha sido eliminado correctamente"
-        else
-            msg = "El cliente con id = $id, no ha sido encontrado para eliminar"
-
-        Log. d(TAG, msg)
-        showConsoleData(msg)
-
-    }
-
-    fun showConsoleData(msg:String){
-        val msg = controller.showData()
-        Thread.sleep(2000)
-        Log. d(TAG, msg)
+    private fun showConsoleData() {
+        Log.d(TAG, controller.getAllClients().toString())
     }
 }
